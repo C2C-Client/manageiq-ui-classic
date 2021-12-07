@@ -1,0 +1,23 @@
+#main_div
+  - if %w(vms cloud_tenants storages miq_proxies miq_templates resource_pools custom_button_events cloud_networks cloud_subnets).include?(@display) && @showtype != "compare"
+    = render :partial => "layouts/gtl", :locals => {:action_url => "show/#{@record.id}"}
+  - else
+    - case @showtype
+    - when "details"
+      = render :partial => "layouts/gtl", :locals => {:action_url => @lastaction}
+    - when "drift_history"
+      = render :partial => "layouts/drift_history"
+    - when "item"
+      = render :partial => "layouts/item"
+    - when "performance"
+      = render :partial => "layouts/performance_async"
+    - when "performance_summary"
+      = render :partial => "layouts/performance_summary"
+    - when "timeline"
+      = render :partial => "layouts/tl_show_async"
+    - when "compliance_history"
+      = render :partial => "shared/views/compliance_history"
+    - when "main"
+      = render :partial => "layouts/textual_groups_generic"
+    - when "config"
+      = render :partial => "config"

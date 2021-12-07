@@ -1,0 +1,20 @@
+- if @sb[:active_tab] == "settings_tags" && @sb[:active_subtab] == "settings_import_tags"
+  #tab_div
+    %h3
+      = _("Messages")
+    %hr
+    %h3
+      = _("Upload %{customer_name} Tag Assignments for VMs") % {:customer_name => session[:customer_name]}
+    .form-horizontal.static
+      .form-group
+        .col-md-8
+          = form_tag({:action => "upload_csv",
+                      :typ    => "tag"},
+                     :multipart => true,
+                     :method    => :post) do
+            .form-group
+              .col-md-7
+                = render :partial => "shared/file_chooser", :locals => {:object_name => "upload", :method => "file"}
+              .col-md-5
+                = submit_tag(_("Upload"), :id => "upload_tags", :class => "btn btn-default")
+            = _("* Requirements: CSV formatted file.")

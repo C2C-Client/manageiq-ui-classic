@@ -1,0 +1,11 @@
+- @angular_form = true
+
+= render :partial => "layouts/flash_msg"
+
+%tenant-form{"record-id"    => @tenant.id,
+             :ancestry      => @tenant_parent,
+             :divisible     => params[:tenant_type] == "tenant",
+             "redirect-url" => "/#{controller_name}/explorer",}
+
+:javascript
+  miq_bootstrap('tenant-form');

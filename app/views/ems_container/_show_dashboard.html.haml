@@ -1,0 +1,19 @@
+= render :partial => "layouts/flash_msg"
+.container-fluid.container-tiles-pf.containers-dashboard
+  .row.row-tile-pf
+    = render :partial => "ems_container/aggregate-status-card"
+  .row.row-tile-pf
+    .col-xs-12.col-sm-12.col-md-6
+      = render :partial => "ems_container/utilization-trend-chart"
+    .col-xs-12.col-sm-12.col-md-6
+      = render :partial => "ems_container/trends-chart"
+      = render :partial => "ems_container/recent-images-line-chart"
+  .row.row-tile-pf
+    .col-xs-12.col-sm-12.col-md-6
+      = render :partial => "ems_container/heatmap"
+    .col-xs-12.col-sm-12.col-md-6
+      = render :partial => "ems_container/recent-pods-line-chart"
+
+  :javascript
+    ManageIQ.angular.app.value('providerId', '#{@record ? @record.id : ''}');
+    miq_bootstrap('.containers-dashboard');

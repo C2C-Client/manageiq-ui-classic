@@ -1,0 +1,34 @@
+= render :partial => 'layouts/doctype'
+%html.layout-pf.layout-pf-fixed.transitions{:lang => I18n.locale.to_s.sub('-', '_')}
+  %head
+    %title= h page_title
+
+    %meta{"http-equiv" => "Pragma", :content => "no-cache"}
+    %meta{"http-equiv" => "Pragma", :content => "no-store"}
+    %meta{"http-equiv" => "Pragma", :content => "must-revalidate"}
+    %meta{"http-equiv" => "cache-control", :content => "no-cache, no-store"}
+
+    = miq_favicon_link_tag
+    = stylesheet_link_tag 'application'
+    = stylesheet_link_tag '/custom.css'
+    = render :partial => "stylesheets/template50"
+    = javascript_dependencies
+    - if Rails.env.development?
+      = javascript_include_tag 'miq_debug'
+      = stylesheet_link_tag 'miq_debug'
+    = csrf_meta_tag
+    = render :partial => 'layouts/i18n_js'
+
+    :javascript
+      ManageIQ.charts.provider = "#{Charting.backend}";
+      ManageIQ.browser = "#{j browser_info(:name_ui)}";
+      ManageIQ.controller = "#{j controller_name}";
+
+    - if ::Settings.server.asynchronous_notifications
+      :javascript
+        miqInitNotifications();
+
+  %body{:onload => 'miqOnLoad();', 'data-controller' => controller_name, :class => ::Settings.server.custom_login_logo ? 'whitelabel' : ''}
+    = render :partial => "layouts/header"
+    = render :partial => "layouts/content"
+    = render :partial => 'layouts/footer'

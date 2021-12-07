@@ -1,0 +1,14 @@
+= render :partial => 'layouts/doctype'
+%html{:lang => I18n.locale.to_s.sub('-', '_')}
+  %head
+    = miq_favicon_link_tag
+    = javascript_include_tag 'jquery/dist/jquery.js'
+    :javascript
+      // INITIALIZE
+      $(document).ready(function(){
+        window.location.href = "#{j(remote_url.to_s)}";
+        setTimeout(function () { window.close(); }, 8000);
+      });
+
+  %body
+    = _('Starting the VMRC application ...')

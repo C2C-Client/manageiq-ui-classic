@@ -1,0 +1,22 @@
+#main_div
+  - list = %w(vms all_vms hosts miq_templates resource_pools storage storage_extents storage_systems custom_button_events)
+  - if list.include?(@display) && !%w(compare drift_history).include?(@showtype)
+    = render :partial => "layouts/gtl", :locals => {:action_url => "show/#{@record.id}"}
+  - else
+    - case @showtype
+    - when "performance"
+      = render(:partial => "layouts/performance_async")
+    - when "details"
+      = render(:partial => "layouts/gtl", :locals => {:action_url => @lastaction})
+    - when "compare", "drift"
+      = render :partial => "layouts/compare"
+    - when "drift_history"
+      = render :partial => "layouts/drift_history"
+    - when "item"
+      = render :partial => "layouts/item"
+    - when "timeline"
+      = render(:partial => "layouts/tl_show_async")
+    - when "main"
+      = render :partial => "layouts/textual_groups_generic"
+    - when "config"
+      = render :partial => "config"

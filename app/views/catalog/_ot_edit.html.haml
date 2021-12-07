@@ -1,0 +1,4 @@
+#form_div
+  #basic_info_div
+    = render :partial => "layouts/flash_msg"
+    = react('OrcherstrationTemplateForm', { :otId => @edit[:rec_id], :managers => @edit[:new][:available_managers] })

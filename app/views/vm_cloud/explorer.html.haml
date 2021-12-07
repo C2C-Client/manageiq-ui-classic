@@ -1,0 +1,18 @@
+- content_for :search do
+  = render(:partial => "layouts/x_adv_searchbox", :locals => {:nameonly => [:images_tree, :instances_tree].include?(x_active_tree)})
+  = render(:partial => 'layouts/quick_search')
+
+-# These are the initial divs that will go inside center_cell_div
+- if @record
+  -# Showing a specific VM or Template record
+  #main_div
+    - if @showtype == "performance"
+      = render(:partial => "layouts/performance_async")
+    - elsif @showtype == "timeline"
+      = render(:partial => "layouts/tl_show_async")
+    - else
+      = render :partial => "layouts/textual_groups_generic"
+- else
+  -# Showing a list of VMs
+  #main_div
+    = render(:partial => 'layouts/x_gtl')
