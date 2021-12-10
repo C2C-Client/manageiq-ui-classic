@@ -1,0 +1,13 @@
+#main_div
+  - case @showtype
+  - when "details"
+    = render(:partial => "layouts/gtl", :locals => {:action_url => @lastaction})
+  - when "item"
+    = render(:partial => "layouts/item")
+  - else
+    - if %w(instances security_groups children custom_button_events).include?(@display)
+      = render :partial => "layouts/gtl", :locals => {:action_url => "show/#{@record.id}"}
+    - elsif @display == 'stack_orchestration_template'
+      = render :partial => "stack_orchestration_template"
+    - elsif @showtype == 'main'
+      = render :partial => "layouts/textual_groups_generic"

@@ -1,0 +1,25 @@
+-#
+  Parameters:
+    widget      MiqWidget object
+- if @edit && @edit[:current]
+  - params = {:id => "w_#{widget.id}", :title => _("Drag/drop Widget \"%{widget_title}\"") % {:widget_title => widget.title}}
+- else
+  - url = "/report/x_show/xx-#{ReportController::Widgets::WIDGET_CONTENT_TYPE.invert[widget.content_type]}_-#{widget.id}?accord=widgets"
+  - params = {:onclick => remote_function(:url => url), :id => widget.id, :title => _("View this Widget")}
+/ .pointer{params}
+.panel.panel-default{params}
+  .panel-heading
+    %h3.panel-title.sortable-handle{:style => @edit && @edit[:current] ? "cursor: move;" : ""}
+      - case widget.content_type
+      - when "chart"
+        - glyphicon = "fa fa-pie-chart"
+      - when "report"
+        - glyphicon = "fa fa-file-text-o"
+
+      - if widget.status.downcase != "none"
+        %i{:class => "#{glyphicon}"}
+
+      - if role_allows?(:feature => "dashboard_add") && @edit && @edit[:current]
+        = render :partial => 'db_widget_remove', :locals => {:widget => widget}
+
+      = widget.title

@@ -1,0 +1,38 @@
+#main_div
+  - if @record.kind_of?(ExtManagementSystem) && !@record.try(:enabled)
+    .alert.alert-warning
+      %span.pficon-layered
+        %span.pficon.pficon-warning-triangle-o
+      %strong
+        = _("Warning: This provider is paused, no data is currently collected from it.")
+  - arr = (controller_name.camelize + "Controller").constantize.display_methods
+  - if arr.include?(@display) && @showtype != "compare"
+    = render :partial => "layouts/gtl", :locals => {:action_url => "show/#{@ems.id}"}
+    - if %w(physical_servers).include?(@display)
+      %physical-server-toolbar#ems_physical_infra_show_list_form
+      :javascript
+        miq_bootstrap('#ems_physical_infra_show_list_form')
+  - elsif @showtype == "details"
+    = render(:partial => "layouts/gtl", :locals => {:action_url => @lastaction})
+  - elsif @showtype ==  "item"
+    = render(:partial => "layouts/item")
+  - elsif @showtype == "compare"
+    = raise 'compare partial called through "show"'
+    = render :partial => "layouts/compare"
+  - elsif @showtype == "timeline"
+    = render :partial => "layouts/tl_show_async"
+  - elsif @showtype == "performance"
+    = render(:partial => "layouts/performance_async")
+  - elsif @showtype == "config"
+    = render :partial => "shared/views/ems_common/config"
+  - elsif @showtype == 'main'
+    = render :partial => "layouts/textual_groups_generic"
+  - elsif @showtype == 'dashboard'
+    = raise 'show_dashboard partial called through "show"'
+    = render :partial => 'show_dashboard'
+  - elsif @showtype == 'ad_hoc_metrics'
+    = render :partial => 'show_ad_hoc_metrics'
+  - elsif @showtype == 'topology'
+    = render :file => 'container_topology/show'
+  - elsif @showtype == "compliance_history"
+    = render :partial => "shared/views/compliance_history"

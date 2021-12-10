@@ -1,0 +1,22 @@
+%fieldset
+  %h3
+    = title
+  %table.table.table-bordered.table-striped.table-hover.table-summary-screen
+    %thead
+      %tr
+        - headers.each do |h|
+          %th
+            = h(h)
+    %tbody
+      - value.each do |row|
+        - if row[:link]
+          - click = row[:explorer] ? row[:link] : "DoNav('#{row[:link]}');"
+          %tr{:onclick => click}
+            - col_order.each do |col|
+              %td{:title => _("View the table")}
+                = row[col.to_sym]
+        - else
+          %tr.no-hover
+            - col_order.each do |col|
+              %td
+                = row[col.to_sym]

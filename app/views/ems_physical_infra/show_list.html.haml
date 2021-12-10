@@ -1,0 +1,7 @@
+#main_div
+  - if EmsPhysicalInfra.any?
+    = render :partial => 'layouts/gtl'
+  - else
+    = render :partial => 'layouts/empty',
+             :locals => {:add_message => _("Add a new Physical Infrastructure Provider"),
+                         :documentation => ::Settings.docs.physical_infra_provider}

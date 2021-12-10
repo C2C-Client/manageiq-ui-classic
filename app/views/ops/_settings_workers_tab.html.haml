@@ -1,0 +1,2 @@
+- if @sb[:active_tab] == "settings_workers"
+  = react('WorkersForm', {:server => @selected_server, :product => Vmdb::Appliance.PRODUCT_NAME, :zone => @selected_server.my_zone})

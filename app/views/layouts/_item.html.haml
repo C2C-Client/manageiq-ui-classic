@@ -1,0 +1,51 @@
+= render :partial => "layouts/flash_msg"
+.form-horizontal
+  - j = (%w(scan_histories registry_items filesystems).include?(@lastaction) ? 0 : 1)
+  - @view.col_order[j..-1].each_with_index do |item, i|
+    .form-group
+      %label.control-label.col-md-2
+        = _(@view.headers[@view.col_order.index(item)])
+      .col-md-8
+        - item_data = @item.send(item)
+        - if %w(data name).include?(@view.headers[i].downcase)
+          - if item_data.respond_to?(:scan)
+            - item_data.scan(/.{1,125}/).each do |data_part|
+              = h(data_part)
+          - else
+            = item_data.to_s.capitalize
+        - elsif @view.headers[i].downcase == "size"
+          = h(number_with_delimiter(item_data))
+        - elsif item_data.kind_of?(Time)
+          = h(format_timezone(item_data))
+        - else
+          = h(item_data)
+  - if @lastaction == "users"
+    .form-group
+      %label.control-label.col-md-2
+        = _("Groups")
+      .col-md-8
+        - groups = @group_names.sort_by { |m| m[:name] }.collect(&:name)
+        = h(groups.join(", "))
+  - elsif @lastaction == "groups"
+    .form-group
+      %label.control-label.col-md-2
+        = _("Users")
+      .col-md-8
+        - users = @user_names.sort_by { |m| m[:name] }.collect(&:name)
+        = h(users.join(", "))
+  - elsif @lastaction == "filesystems"
+    .form-group
+      %label.control-label.col-md-2
+        = _("Contents")
+      .col-md-8
+        - if @item.has_contents?
+          %p
+            = link_to(_("Download"), :action => "filesystem_download", :id => @item.id)
+          - if @item.contents_displayable?
+            = text_area_tag("item_contents", @item.displayable_contents, :readonly => "readonly", :style => "overflow:auto;width:600px;height:400px;")
+          - else
+            = _("Cannot display binary content")
+        - else
+          = _("Not Available")
+%tr
+  %th{:colspan => "3", :class => "footer"}

@@ -1,0 +1,12 @@
+.bundle/
+coverage/
+doc/
+pkg/
+spec/manageiq
+spec/reports/
+tmp/
+.rubocop-*
+.idea/
+.vscode/
+.ruby-version
+*.sw[po]

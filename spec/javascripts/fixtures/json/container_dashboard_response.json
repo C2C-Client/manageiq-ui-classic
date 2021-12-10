@@ -1,0 +1,158 @@
+{
+  "data": {
+    "status": {
+      "services": {
+        "errorCount": 0,
+        "count": 9,
+        "warningCount": 0
+      },
+      "containers": {
+        "count": 11,
+        "errorCount": 0,
+        "warningCount": 0
+      },
+      "projects": {
+        "count": 11,
+        "errorCount": 0,
+        "warningCount": 0
+      },
+      "pods": {
+        "warningCount": 0,
+        "errorCount": 0,
+        "count": 11
+      },
+      "routes": {
+        "count": 2,
+        "errorCount": 0,
+        "warningCount": 0
+      },
+      "images": {
+        "errorCount": 0,
+        "count": 8,
+        "warningCount": 0
+      },
+      "nodes": {
+        "errorCount": 0,
+        "count": 9,
+        "warningCount": 0
+      },
+      "registries": {
+        "count": 3,
+        "errorCount": 0,
+        "warningCount": 0
+      }
+    },
+    "heatmaps": {
+      "nodeCpuUsage": [
+        {
+          "id": 1,
+          "node": "oshift01.eng.lab.tlv.redhat.com",
+          "provider": "Molecule",
+          "total": 2,
+          "percent": 0.18
+        }
+      ],
+      "nodeMemoryUsage":[
+        {
+          "id":1,
+          "node":"oshift01.eng.lab.tlv.redhat.com",
+          "provider":"Molecule",
+          "total": 7822,
+          "percent": 0.82
+        }
+      ]
+    },
+    "providers": [
+      {
+        "count": 2,
+        "iconImage": "...openshift..."
+      },
+      {
+        "count": 1,
+        "iconImage": "...kubernetes..."
+      }
+    ],
+    "alerts": {
+      "count": 5,
+      "href": "/alerts_overview/show",
+      "notifications": [
+        {
+          "count": 2,
+          "iconImage": "...error..."
+        },
+        {
+          "count": 1,
+          "iconImage": "...warning..."
+        }
+      ]
+    },
+    "ems_utilization": {
+      "interval_name": "daily",
+      "xy_data": {
+        "cpu": {
+          "total": 8,
+          "used": 3,
+          "xData": [
+            "2015-11-26"
+          ],
+          "yData": [
+            3
+          ]
+        },
+        "memory": {
+          "total": 21,
+          "used": 12,
+          "xData": [
+            "2015-11-26"
+          ],
+          "yData": [
+            12
+          ]
+        }
+      }
+    },
+    "network_metrics" : {
+      "interval_name": "daily",
+      "xy_data": {
+        "xData": [
+          "2015-12-07",
+          "2015-12-08"
+        ],
+        "yData": [
+          2420,
+          2431
+        ]
+      }
+    },
+    "pod_metrics" : {
+      "interval_name": "daily",
+      "xy_data": {
+        "xData": [
+          "2015-12-07",
+          "2015-12-08"
+        ],
+        "yCreated": [
+          8,
+          87
+        ],
+        "yDeleted": [
+          38,
+          42
+        ]
+      }
+    },
+    "image_metrics" : {
+      "interval_name": "daily",
+      "xy_data": {
+        "xData": [
+          "2015-12-07",
+          "2015-12-08"
+        ],
+        "yData": [
+          23,
+          45
+        ]
+      }
+    }
+  }
+}

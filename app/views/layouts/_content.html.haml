@@ -1,0 +1,89 @@
+- if big_iframe
+  = render :partial => "layouts/vertical_navbar"
+  .container-fluid.container-pf-nav-pf-vertical.container-pf-nav-pf-vertical-with-sub-menus.resizable-sidebar.max-height{:style => "overflow: hidden !important"}
+    .row.max-height
+      = yield
+- elsif inner_layout_present?
+  - session[:sidebar] ||= {}
+  - sidewidth = simulate? ? 5 : session[:sidebar][params[:controller]] ||= 3
+  - maindiv = 12 - sidewidth
+  - sidebar = sidewidth == 0 ? 'hidden-md hidden-lg col-md-0' : "col-md-#{sidewidth} col-md-pull-#{maindiv}"
+
+  = render :partial => "layouts/vertical_navbar"
+
+  .container-fluid.container-pf-nav-pf-vertical.container-pf-nav-pf-vertical-with-sub-menus.resizable-sidebar.max-height{:style => "overflow: hidden !important"}
+    #breadcrumbs
+      = render :partial => "layouts/breadcrumbs"
+    .row.toolbar-pf#toolbar.miq-toolbar-menu
+      .col-sm-12
+        = render :partial => "layouts/angular/toolbar"
+    .row.max-height
+      #right_div.resizable.max-height{:class => "col-md-#{maindiv} col-md-push-#{sidewidth}"}
+        #main-content.row.miq-layout-content
+          .col-md-12
+            .row
+              .col-md-7#explorer
+                %h1#explorer_title
+                  %span#explorer_title_text
+                    = URI.unescape(@right_cell_text) if @right_cell_text
+                  -# Link to clear the current applied filter, will be moved via JS to the right cell header
+                  %span#clear_search{:style => "display:none"}
+                    - if route_exists?(:action => 'adv_search_clear')
+                      (
+                      = link_to(_("clear"),
+                                {:action              => "adv_search_clear"},
+                                "data-miq_sparkle_on" => true,
+                                :remote               => true,
+                                "data-method"         => :post,
+                                :title                => _("Remove the current filter"),
+                                :style                => "text-decoration: underline;")
+                      )
+              .col-md-5
+                %br
+                = yield :search
+            .row
+              .col-md-12
+                = yield
+        .col-md-12.no-padding
+          = render :partial => 'layouts/x_form_buttons'
+          .row#paging_div{:style => saved_report_paging? ? "" : "display: none"}
+            - if saved_report_paging?
+              = render(:partial => 'layouts/saved_report_paging_bar',
+                       :locals  => {:pages => @sb[:pages]})
+
+        - unless simulate?
+          .resizer.hidden-xs
+            .resizer-box
+              .btn-group
+                .btn.btn-default.resize-left
+                  %span.fa.fa-angle-left
+                .btn.btn-default.resize-right{:class => sidewidth == 5 ? 'disabled' : ''}
+                  %span.fa.fa-angle-right
+
+      #left_div.resizable.sidebar-pf.sidebar-pf-left.max-height.scrollable{:class => sidebar}
+        #default_left_cell
+          - if @accords && @trees
+            = render :partial => "layouts/listnav"
+          = yield :left
+        #custom_left_cell
+- elsif layout_full_center
+  = render :partial => "layouts/vertical_navbar"
+  = render :partial => layout_full_center
+- else
+  #center_div{:style => "height: 100%;"}
+    = render :partial => center_div_partial
+
+- if show_advanced_search?
+  :javascript
+    #{javascript_show_if_exists("adv_searchbox_div")}
+
+:javascript
+  // a hack to prevent toolbars disappearing behind top menus, see BZ#1291465 for details
+  $('.container-fluid').scrollTop(0);
+
+- if @record
+  :javascript
+    ManageIQ.record.recordId = '#{@record.id}';
+- else
+  :javascript
+    ManageIQ.record.recordId = null;

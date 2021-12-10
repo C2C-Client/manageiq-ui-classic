@@ -1,0 +1,7 @@
+- url = url_for_only_path(:action => 'evm_relationship_field_changed')
+#tab_div
+  = render :partial => "layouts/flash_msg"
+  %h3
+    = _('Servers')
+  .col-md-12
+    = react('VmServerRelationshipForm', { :vmId => @edit[:vm_id].to_s, :serverId => @edit[:new][:server].to_s})

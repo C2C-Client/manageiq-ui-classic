@@ -1,0 +1,14 @@
+#main_div
+  - if @showtype == "performance"
+    = render :partial => "layouts/performance_async"
+  - else
+    - if %w(instances cloud_volumes).include?(@display) && @showtype != "compare"
+      = render :partial => "layouts/gtl", :locals => {:action_url => "show/#{@record.id}"}
+    - elsif @showtype == "drift_history"
+      = render :partial => "layouts/drift_history"
+    - elsif @showtype == "item"
+      = render :partial => "layouts/item"
+    - elsif @showtype == "timeline"
+      = render :partial => "layouts/tl_show_async"
+    - elsif @showtype == "main"
+      = render :partial => "layouts/textual_groups_generic"

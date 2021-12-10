@@ -1,0 +1,10 @@
+-# locals: chart, html, report
+- if chart
+  = chart_remote('report', :id => 'my_chart', :zoomed => false)
+
+  - if !html && report.filter_summary
+    = report.filter_summary
+  %p
+
+- if html
+  = render :partial => 'layouts/report_html'

@@ -1,0 +1,33 @@
+#main_div
+  - if @ownershipedit
+    = render :partial => "shared/views/ownership"
+  - elsif @rightsize
+    = render :partial => "vm_common/right_size"
+  - elsif @reconfigure
+    = render :partial => "vm_common/reconfigure"
+  - elsif request.parameters[:action] == "provision"
+    = render :partial => "vm_common/provision"
+  - else
+    - case @showtype
+    - when "details"
+      = render :partial => "layouts/gtl", :locals => {:action_url => @lastaction}
+    - when "miq_proxies", "storage_extents", "storage_systems", "custom_button_events"
+      = render :partial => "layouts/gtl", :locals => {:action_url => "show/#{@miq_template.id}"}
+    - when "compare"
+      = render :partial => "layouts/compare"
+    - when "drift_history"
+      = render :partial => "layouts/drift_history"
+    - when "drift"
+      = render :partial => "layouts/drift"
+    - when "item"
+      = render :partial => "layouts/item"
+    - when "performance"
+      = render :partial => "layouts/performance_async"
+    - when "performance_summary"
+      = render :partial => "layouts/performance_summary"
+    - when "timeline"
+      = render :partial => "layouts/tl_show"
+    - when "compliance_history"
+      = render :partial => "shared/views/compliance_history"
+    - else
+      = render :partial => "vm_common/#{@showtype}", :locals => {:controller => "miq_template"}

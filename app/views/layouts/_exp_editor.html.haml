@@ -1,0 +1,105 @@
+-# Set the JS type vars if a saved expression atom already exists when first showing the editor
+- if @edit && @edit.fetch_path(@expkey, :val1, :type)
+  = javascript_tag("ManageIQ.expEditor.first.type = '#{@edit[@expkey][:val1][:type]}';")
+  = javascript_tag("ManageIQ.expEditor.first.title = '#{@edit[@expkey][:val1][:title]}';")
+- if @edit && @edit.fetch_path(@expkey, :val2, :type)
+  = javascript_tag("ManageIQ.expEditor.second.type = '#{@edit[@expkey][:val2][:type]}';")
+  = javascript_tag("ManageIQ.expEditor.second.title = '#{@edit[@expkey][:val2][:title]}';")
+
+#exp_editor_div
+  = render :partial => 'layouts/flash_msg', :locals => {:flash_div_id => 'exp_editor_flash', :flash_style => "display:none"}
+  .panel.panel-default
+    .panel-heading
+      %h3.panel-title
+        =_('Edit Expression')
+    .panel-body
+      .form-group
+        - if @edit[@expkey].history.idx > 0
+          - t = _('Undo the last change')
+          %button.btn.btn-default{:onclick      => "miqAjax('#{url_for_only_path(:action => 'exp_button', :pressed => 'undo')}');",
+                                  :title        => t}
+            %i.fa.fa-reply
+        - else
+          %button.btn.btn-default.disabled
+            %i.fa.fa-reply
+
+        - if @edit[@expkey].history.idx < @edit[@expkey].history.array.length - 1
+          - t = _('Re-apply the previous change')
+          %button.btn.btn-default{:onclick      => "miqAjax('#{url_for_only_path(:action => 'exp_button', :pressed => 'redo')}');",
+                                  :title        => t}
+            %i.fa.fa-mail-forward
+        - else
+          %button.btn.btn-default.disabled
+            %i.fa.fa-mail-forward
+        %span#exp_buttons_off
+          %button.btn.btn-default.disabled
+            %i.fa-lg.pficon.pficon-close
+
+        %span#exp_buttons_on{:style => "display: none"}
+          %button.btn.btn-default{:onclick => "miqAjax('#{url_for_only_path(:action => 'exp_button', :pressed => 'remove')}');",
+                                  :title   => _("Remove this expression element")}
+            %i.fa-lg.pficon.pficon-close
+      %p
+        - @edit[@expkey][:exp_table].each do |token|
+          - if ! %w(AND OR ( ) ???).include?([token].flatten.first)
+            - if @edit[@expkey][:exp_token]
+              - if @edit[@expkey][:exp_token] == token.last
+                %strong{:style => "color: #0088ce"}
+                  = token.first
+              - else
+                = token.first
+            - else
+              = link_to(token.first,
+                        {:action => 'exp_token_pressed',
+                         :token  => token.last},
+                        "data-miq_sparkle_on"  => true,
+                        :remote                => true,
+                        "data-method"          => :post,
+                        :id                    => "exp_#{token.last}")
+          - elsif [token].flatten.first == "???"
+            %strong{:style => "color: #0088ce"}
+              - if @edit[@expkey][:exp_token]
+                = "<#{_('new element')}>"
+              - else
+                = link_to("<#{_('new element')}>",
+                          {:action => 'exp_token_pressed',
+                           :token  => token.last},
+                           :style                 => "text-decoration: underline",
+                           "data-miq_sparkle_on"  => true,
+                           :remote                => true,
+                           "data-method"          => :post,
+                           :id                    => "exp_#{token.last}")
+          - else
+            %strong
+              = token.downcase
+      .spacer
+      .form-group
+        =_('Add a Condition:')
+        %span#exp_buttons2_off
+          - %w(and or not).each do |image|
+            .btn.btn-default.disabled
+              #{image}
+
+        %span#exp_buttons2_not{:style => "display: none"}
+          - [[_("AND with a new expression element"), 'and', 'and'],
+             [_("OR with a new expression element"),  'or',  'or'],
+             ["",                                     'not', '']].each do |title, image, pressed|
+            - if title.empty?
+              %button.btn.btn-default.disabled
+                #{image}
+
+            - else
+              %button.btn.btn-default{:onclick => "miqAjax('#{url_for_only_path(:action => 'exp_button', :pressed => pressed)}');",
+                                      :title   => title}
+                #{image}
+
+        %span#exp_buttons2_on{:style => "display: none"}
+          - [[_("AND with a new expression element"),       'and',     'and'],
+             [_("OR with a new expression element"),        'or',      'or'],
+             [_("Wrap this expression element with a NOT"), 'not',     'not']].each do |title, image_text, pressed|
+            %button.btn.btn-default{:onclick => "miqAjax('#{url_for_only_path(:action => 'exp_button', :pressed => pressed)}');",
+                                    :title   => title}
+              #{image_text}
+
+  - if @edit[@expkey][:exp_token]
+    = render(:partial => 'layouts/exp_atom/editor')

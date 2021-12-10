@@ -1,0 +1,19 @@
+%h3
+  = @miq_action_hash[:header]
+%p
+  = @miq_action_hash[:policy_detail]
+%table
+  %tr
+    %td= _('Event:')
+    %td
+      = @miq_action_hash[:event_description]
+  %tr
+    %td= _('Entity:')
+    %td
+      (#{@miq_action_hash[:entity_type]})
+      = @miq_action_hash[:entity_name]
+  - if @miq_action_hash[:event_details]
+    %tr
+      %td= _('Details')
+      %td
+        = @miq_action_hash[:event_details]

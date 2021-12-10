@@ -1,0 +1,7 @@
+#main_div
+  - if EmsNetwork.any?
+    = render :partial => "layouts/gtl"
+  - else
+    = render :partial => 'layouts/empty',
+             :locals => {:add_message => _("Add a new Network Provider"),
+                         :documentation => ::Settings.docs.network_provider}

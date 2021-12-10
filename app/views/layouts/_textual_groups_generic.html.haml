@@ -1,0 +1,4 @@
+= render :partial => "layouts/flash_msg"
+#textual_summary
+:javascript
+  ManageIQ.component.componentFactory('TextualSummaryWrapper', '#textual_summary', {summary: #{process_textual_info(textual_group_list, @record).to_json}});

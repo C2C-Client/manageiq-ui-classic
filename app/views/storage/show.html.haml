@@ -1,0 +1,13 @@
+#main_div
+  - if %w(all_vms hosts miq_proxies all_miq_templates storage_extents storage_systems registered_vms unregistered_vms custom_button_events).include?(@display) && @showtype != "compare"
+    = render :partial => "layouts/x_gtl", :locals => {:action_url => "show/#{@record.id}"}
+  - else
+    - case @showtype
+    - when "details"
+      = render :partial => "layouts/x_gtl", :locals => {:action_url => @lastaction}
+    - when "item"
+      = render :partial => "layouts/item"
+    - when "performance"
+      = render :partial => "layouts/performance_async"
+    - when "main"
+      = render :partial => "layouts/textual_groups_generic"
