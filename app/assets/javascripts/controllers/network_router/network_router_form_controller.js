@@ -1,4 +1,4 @@
-ManageIQ.angular.app.controller('networkRouterFormController', ['$scope', 'networkRouterFormId', 'miqService', 'API', function($scope, networkRouterFormId, miqService, API) {
+ManageIQ.angular.app.controller('networkRouterFormController', ['$scope', 'networkRouterFormId', 'networkManagerId', 'miqService', 'API', function($scope, networkRouterFormId, networkManagerId, miqService, API) {
   var vm = this;
 
   var init = function() {
@@ -24,6 +24,7 @@ ManageIQ.angular.app.controller('networkRouterFormController', ['$scope', 'netwo
 
     miqService.sparkleOn();
     if (vm.newRecord) {
+      vm.networkRouterModel.ems_id = networkManagerId;     // C2C provider : set default provider network manager while creating resource through network manager.
       miqService.networkProviders()
         .then(function(providers) {
           vm.ems = providers;
@@ -36,6 +37,7 @@ ManageIQ.angular.app.controller('networkRouterFormController', ['$scope', 'netwo
           vm.modelCopy = angular.copy(vm.networkRouterModel);
           miqService.sparkleOff();
         });
+      vm.filterNetworkManagerChanged(networkManagerId);   // C2C provider : calling filterNetworkManagerChanged function and pass network manager id.
     } else {
       return API.get('/api/network_routers/' + networkRouterFormId + '?attributes=name,admin_state_up,cloud_network_id,cloud_tenant.name,ext_management_system.id,ext_management_system.name,extra_attributes').then(function(data) {
         Object.assign(vm.networkRouterModel, data);

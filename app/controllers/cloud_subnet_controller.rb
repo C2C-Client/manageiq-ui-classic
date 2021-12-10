@@ -48,7 +48,11 @@ class CloudSubnetController < ApplicationController
     assert_privileges("cloud_tenant_show_list")
     assert_privileges("cloud_network_show_list")
 
+    # C2C Provider : this code for fetching network manager id while subnet creation (button inside network manager).
     @in_a_form = true
+    if params[:ems_id]
+      @network_manager = find_record_with_rbac(ExtManagementSystem, params[:ems_id])
+    end
     drop_breadcrumb(:name => _("Add New Subnet"), :url => "/cloud_subnet/new")
   end
 
@@ -56,8 +60,10 @@ class CloudSubnetController < ApplicationController
     assert_privileges("cloud_subnet_new")
     case params[:button]
     when "cancel"
-      javascript_redirect(:action    => 'show_list',
-                          :flash_msg => _("Creation of a Cloud Subnet was cancelled by the user"))
+      # C2C Provider : This Code prevent redirection of page to show_list after clicking cancel button while subnet creation.
+      # javascript_redirect(:action    => 'show_list',
+      #                     :flash_msg => _("Creation of a Cloud Subnet was cancelled by the user"))
+      cancel_action(_("Creation of a Cloud Subnet was cancelled by the user"))
 
     when "add"
       @subnet = CloudSubnet.new
@@ -104,10 +110,12 @@ class CloudSubnetController < ApplicationController
                 { :name => subnet_name, :details => task.message }, :error)
     end
 
-    @breadcrumbs&.pop
+    # C2C Provider : This Code prevent redirection of page to show_list page after adding/creating subnet.
+    # @breadcrumbs&.pop
     session[:edit] = nil
     flash_to_session
-    javascript_redirect(:action => "show_list")
+    # javascript_redirect(:action => "show_list")
+    javascript_redirect(previous_breadcrumb_url)
   end
 
   def delete_subnets
@@ -126,6 +134,11 @@ class CloudSubnetController < ApplicationController
       process_cloud_subnets(subnets_to_delete, "destroy")
     end
 
+    # C2C provider : issue/bug : after deleting subnet it will redirect to show_list page.
+    # this should not happen, therefore we redirect to previous page.
+    # by using previous_breadcrumb_url method the page will redirect to previous page.
+    # this method define in application_controller.rb
+
     # refresh the list if applicable
     if @lastaction == "show_list"
       show_list
@@ -136,7 +149,7 @@ class CloudSubnetController < ApplicationController
         add_flash(_("The selected Cloud Subnet was deleted"))
       end
       flash_to_session
-      javascript_redirect(:action => 'show_list')
+      javascript_redirect(previous_breadcrumb_url)
     else
       drop_breadcrumb(:name => 'dummy', :url => " ") # missing a bc to get correctly back so here's a dummy
       flash_to_session

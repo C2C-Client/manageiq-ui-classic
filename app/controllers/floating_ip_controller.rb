@@ -46,7 +46,9 @@ class FloatingIpController < ApplicationController
     assert_privileges("floating_ip_new")
     case params[:button]
     when "cancel"
-      javascript_redirect(:action => 'show_list', :flash_msg => _("Add of new Floating IP was cancelled by the user"))
+      # C2C Provider : This Code prevent redirection of page to show_list after clicking cancel button while floating ip creation.
+      # javascript_redirect(:action => 'show_list', :flash_msg => _("Add of new Floating IP was cancelled by the user"))
+      cancel_action(_("Add of new Floating IP was cancelled by the user"))
     when "add"
       options = form_params
       ems = ExtManagementSystem.find(options[:ems_id])
@@ -84,16 +86,23 @@ class FloatingIpController < ApplicationController
                                                                                 :details => task.message}, :error)
     end
 
-    @breadcrumbs&.pop
+    # C2C Provider : This Code prevent redirection of page to show_list page after adding/creating Floating ip.
+    # @breadcrumbs&.pop
     session[:edit] = nil
     flash_to_session
-    javascript_redirect(:action => "show_list")
+    # javascript_redirect(:action => "show_list")
+    javascript_redirect(previous_breadcrumb_url)
   end
 
   def delete_floating_ips
     assert_privileges("floating_ip_delete")
     floating_ips = find_records_with_rbac(FloatingIp, checked_or_params)
     process_floating_ips(floating_ips, "destroy")
+
+    # C2C provider : issue/bug : after deleting Floating ip it will redirect to show_list page.
+    # this should not happen, therefore we redirect to previous page.
+    # by using previous_breadcrumb_url method the page will redirect to previous page.
+    # this method define in application_controller.rb
 
     # refresh the list if applicable
     if @lastaction == "show_list"
@@ -105,7 +114,7 @@ class FloatingIpController < ApplicationController
         add_flash(_("The selected Floating IP was deleted"))
       else # or (if we deleted what we were showing) we redirect to the listing
         flash_to_session
-        javascript_redirect(:action => 'show_list')
+        javascript_redirect(previous_breadcrumb_url)
       end
     end
   end
@@ -122,6 +131,10 @@ class FloatingIpController < ApplicationController
     assert_privileges("floating_ip_new")
     @floating_ip = FloatingIp.new
     @in_a_form = true
+    # C2C Provider : this code for fetching network manager id while Floating ip creation (button inside network manager).
+    if params[:ems_id]
+      @network_manager = find_record_with_rbac(ExtManagementSystem, params[:ems_id])
+    end
     drop_breadcrumb(:name => _("Add New Floating IP"), :url => "/floating_ip/new")
   end
 

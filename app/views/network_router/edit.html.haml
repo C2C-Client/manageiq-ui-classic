@@ -1,1 +1,18 @@
-= render :partial => "common_new_edit"
+%form#form_div{'name'          => 'angularForm',
+               'ng-controller' => 'networkRouterFormController as vm',
+               'ng-cloak'      => '',
+               'miq-form'      => true,
+               'form-changed'  => true,
+               'model'         => 'vm.networkRouterModel',
+               'model-copy'    => 'vm.modelCopy',
+               'ng-show'       => 'vm.afterGet'}
+
+  = render :partial => 'layouts/flash_msg'
+
+  = render :partial => "common_new_edit"
+
+-# C2C provider : for fetching network manager id.
+:javascript
+  ManageIQ.angular.app.value('networkRouterFormId', '#{@router.id}');
+  ManageIQ.angular.app.value('networkManagerId', '#{@router.ext_management_system.id.to_s}');
+  miq_bootstrap('#form_div');

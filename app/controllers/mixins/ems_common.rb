@@ -198,6 +198,14 @@ module Mixins
       manager.storage_managers.detect(&:supports_block_storage?)&.id
     end
 
+    # C2C Provider : Code for fetch Network Manager Id.
+    def network_manager_id(provider_id)
+      manager = find_record_with_rbac(ExtManagementSystem, provider_id)
+      return nil unless manager
+      return manager.id unless manager.respond_to?(:network_manager)
+      manager.network_manager.id
+    end
+
     # handle buttons pressed on the button bar
     def button
       @edit = session[:edit]                                  # Restore @edit for adv search box
@@ -455,6 +463,26 @@ module Mixins
         javascript_redirect :controller => "network_router",
                             :action     => "remove_interface_select",
                             :id         => find_record_with_rbac(NetworkRouter, checked_or_params)
+      elsif params[:pressed] == "security_group_new"
+        javascript_redirect :controller         => "security_group",
+                            :action             => "new",
+                            :ems_id => network_manager_id(params[:id])
+      elsif params[:pressed] == "floating_ip_new"
+        javascript_redirect :controller         => "floating_ip",
+                            :action             => "new",
+                            :ems_id => network_manager_id(params[:id])
+      elsif params[:pressed] == "cloud_subnet_new"
+        javascript_redirect :controller         => "cloud_subnet",
+                            :action             => "new",
+                            :ems_id => network_manager_id(params[:id])
+      elsif params[:pressed] == "cloud_network_new"
+        javascript_redirect :controller         => "cloud_network",
+                            :action             => "new",
+                            :ems_id => network_manager_id(params[:id])
+      elsif params[:pressed] == "network_router_new"
+        javascript_redirect :controller         => "network_router",
+                            :action             => "new",
+                            :ems_id => network_manager_id(params[:id])
       elsif params[:pressed] == 'ems_infra_change_password'
         javascript_redirect(change_password_ems_physical_infra_path(checked_or_params.first))
       elsif params[:pressed].ends_with?("_edit") ||
@@ -528,11 +556,15 @@ module Mixins
       @provider_regions = retrieve_provider_regions
       @openstack_infra_providers = retrieve_openstack_infra_providers
       @openstack_security_protocols = retrieve_openstack_security_protocols
+      # C2C: Added code for C2C cloud providers
+      @telefonica_security_protocols = retrieve_c2c_security_protocols
       @amqp_security_protocols = retrieve_amqp_security_protocols
       @nuage_security_protocols = retrieve_nuage_security_protocols
       @container_security_protocols = retrieve_container_security_protocols
       @scvmm_security_protocols = [[_('Basic (SSL)'), 'ssl'], ['Kerberos', 'kerberos']]
       @openstack_api_versions = retrieve_openstack_api_versions
+      # C2C: Added code for C2C cloud providers
+      @telefonica_api_versions = retrieve_c2c_api_versions
       @vmware_cloud_api_versions = retrieve_vmware_cloud_api_versions
       @azure_stack_api_versions = retrieve_azure_stack_api_versions
       @emstype_display = model.supported_types_and_descriptions_hash[@ems.emstype]
@@ -563,6 +595,16 @@ module Mixins
       [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
     end
 
+    # C2C: Added code for C2C cloud providers
+    def retrieve_c2c_api_versions
+      [['Keystone v3', 'v3']]
+    end
+
+    # C2C Provider: Added code for apsara cloud provider
+    def retrieve_apsara_api_versions
+      [['V3', 'v3']]
+    end
+
     def retrieve_vmware_cloud_api_versions
       [['vCloud API 5.1', '5.1'], ['vCloud API 5.5', '5.5'], ['vCloud API 5.6', '5.6'], ['vCloud API 9.0', '9.0']]
     end
@@ -581,6 +623,16 @@ module Mixins
 
     def retrieve_openstack_security_protocols
       retrieve_security_protocols
+    end
+
+    # C2C: Added code for C2C cloud providers for security protocol field at provider validation page
+    def retrieve_c2c_security_protocols
+      [[_('SSL'), 'ssl-with-validation']]
+    end
+
+    # C2C Provider: Added code for apsara cloud provider
+    def retrieve_apsara_security_protocols
+      [[_('SSL'), 'ssl-with-validation'], [_('Non-SSL'), 'non-ssl']]
     end
 
     def retrieve_nuage_security_protocols

@@ -21,6 +21,7 @@
                 'ng-change'  => "vm.filterNetworkManagerChanged(vm.securityGroupModel.ems_id)",
                 'ng-model'   => "vm.securityGroupModel.ems_id",
                 'ng-options' => 'ems.id as ems.name for ems in vm.ems',
+                "disabled"    => @network_manager.present? || @security_group.try(:id).present?,
                 'miq-select' => true,
                 'required'   => ''}
           %option{:value => ""}
@@ -51,5 +52,6 @@
   = render :partial => "layouts/angular/generic_form_buttons"
 
 :javascript
-  ManageIQ.angular.app.value('securityGroupFormId', '#{@security_group.id || "new"}');
+  ManageIQ.angular.app.value('securityGroupFormId', 'new');
+  ManageIQ.angular.app.value('networkManagerId', '#{@network_manager.try(:id).to_s || "undefined"}');
   miq_bootstrap('#form_div');

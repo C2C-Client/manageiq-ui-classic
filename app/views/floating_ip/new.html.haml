@@ -1,1 +1,19 @@
-= render :partial => "common_new_edit"
+%form#form_div{'name'          => 'angularForm',
+               'form-changed'  => true,
+               'miq-form'      => true,
+               'model'         => 'vm.floatingIpModel',
+               'model-copy'    => 'vm.modelCopy',
+               'ng-cloak'      => '',
+               'ng-controller' => 'floatingIpFormController as vm',
+               'ng-show'       => 'vm.afterGet'}
+
+  = render :partial => "layouts/flash_msg"
+
+  .form-group
+    = render :partial => "common_new_edit"
+
+-# C2C provider : for fetching network manager id.
+:javascript
+  ManageIQ.angular.app.value('floatingIpFormId', 'new');
+  ManageIQ.angular.app.value('networkManagerId', '#{@network_manager.try(:id).to_s || "undefined"}');
+  miq_bootstrap('#form_div');

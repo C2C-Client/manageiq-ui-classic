@@ -168,7 +168,12 @@ module ApplicationController::MiqRequestMethods
       path_to_report = ManageIQ::UI::Classic::Engine.root.join("product", "views", provisioning_report).to_s
       @view = MiqReport.new(YAML.safe_load(File.open(path_to_report), [Symbol]))
       @view.db = get_template_kls.to_s
-      report_scopes = %i[eligible_for_provisioning non_deprecated]
+      # C2C Provider: Code for selected provider vise image filtration.
+      if request.parameters[:provider_id].present?
+        report_scopes = [[:with_id_eligible_for_provisioning, request.parameters[:provider_id]], :non_deprecated]
+      else
+        report_scopes = %i[eligible_for_provisioning non_deprecated]
+      end
       options = options_for_provisioning(@view.db, report_scopes)
 
       @report_data_additional_options = ApplicationController::ReportDataAdditionalOptions.from_options(options)

@@ -29,6 +29,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       security_protocol: '',
       amqp_security_protocol: '',
       provider_region: '',
+      project_name: '',
       default_userid: '',
       default_password: '',
       amqp_userid: '',

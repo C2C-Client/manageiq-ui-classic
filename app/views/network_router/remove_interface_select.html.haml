@@ -19,6 +19,8 @@
            :locals  => {:button_label           => _("Remove"),
                         :button_click           => "vm.removeInterfaceClicked()"}
 
+-# C2C provider : for fetching network manager id.
 :javascript
   ManageIQ.angular.app.value('networkRouterFormId', '#{@router.id}');
+  ManageIQ.angular.app.value('networkManagerId', '#{@router.ext_management_system.id.to_s}');
   miq_bootstrap('#form_div');

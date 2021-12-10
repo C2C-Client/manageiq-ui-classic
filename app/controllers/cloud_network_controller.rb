@@ -50,8 +50,10 @@ class CloudNetworkController < ApplicationController
     assert_privileges("cloud_network_new")
     case params[:button]
     when "cancel"
-      javascript_redirect :action    => 'show_list',
-                          :flash_msg => _("Add of new Cloud Network was cancelled by the user")
+      # C2C Provider : This Code prevent redirection of page to show_list after clicking cancel button while cloud-network creation.
+      # javascript_redirect :action    => 'show_list',
+      #                     :flash_msg => _("Add of new Cloud Network was cancelled by the user")
+      cancel_action(_("Add of new Cloud Network was cancelled by the user"))
 
     when "add"
       options = form_params
@@ -87,10 +89,12 @@ class CloudNetworkController < ApplicationController
                                                                                 :details => task.message }, :error)
     end
 
-    @breadcrumbs&.pop
+    # C2C Provider : This Code prevent redirection of page to show_list page after adding/creating resource.
+    # @breadcrumbs&.pop
     session[:edit] = nil
     flash_to_session
-    javascript_redirect :action => "show_list"
+    # javascript_redirect :action => "show_list"
+    javascript_redirect(previous_breadcrumb_url)
   end
 
   def delete_networks
@@ -140,8 +144,12 @@ class CloudNetworkController < ApplicationController
     assert_privileges("ems_network_show_list")
     assert_privileges("cloud_tenant_show_list")
 
+    # C2C Provider : this code for fetching network manager id while resource creation (button inside network manager).
     @network = CloudNetwork.new
     @in_a_form = true
+    if params[:ems_id]
+      @network_manager = find_record_with_rbac(ExtManagementSystem, params[:ems_id])
+    end
 
     drop_breadcrumb(:name => _("Add New Cloud Network"), :url => "/cloud_network/new")
   end

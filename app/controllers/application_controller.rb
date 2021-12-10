@@ -1425,7 +1425,8 @@ class ApplicationController < ActionController::Base
                               :prov_id    => @prov_id)
         end
       else
-        javascript_redirect(:controller => @redirect_controller, :action => @refresh_partial, :id => @redirect_id, :template_klass => @template_klass_type)
+        # C2C Provider: Added provider_id parameter for image filtration.
+        javascript_redirect(:controller => @redirect_controller, :action => @refresh_partial, :id => @redirect_id, :template_klass => @template_klass_type, :provider_id => @provider_id)
       end
     elsif params[:pressed] == "ems_cloud_edit" && params[:id]
       javascript_redirect(edit_ems_cloud_path(params[:id]))
@@ -1599,6 +1600,7 @@ class ApplicationController < ActionController::Base
     return if flash_errors?
     @in_a_form = true
     @template_klass_type = template_types_for_controller
+    @provider_id = provider_id_for_controller # C2C Provider: Code for fetch selected provider id.
     @org_controller = "vm" # request originated from controller
     @refresh_partial = typ ? "prov_edit" : "pre_prov"
     if typ
@@ -1648,6 +1650,11 @@ class ApplicationController < ActionController::Base
     else
       'cloud'
     end
+  end
+
+  # C2C Provider: Code for fetch selected provider id.
+  def provider_id_for_controller
+    request.parameters[:id] if request.parameters[:id]
   end
 
   def vm_clone

@@ -2,9 +2,10 @@ module ApplicationController::Tags
   extend ActiveSupport::Concern
 
   # Edit user, group or tenant tags
-  def tagging_edit(db = nil, assert = true)
+  # C2C Provider: Remove and Added code for tagging while editing
+  def tagging_edit(db = nil, assert = false)
     assert_privileges("#{@display && @display != "main" ? @display.singularize : controller_for_common_methods}_tag") if assert
-    @explorer = true if request.xml_http_request? # Ajax request means in explorer
+    @explorer = false if request.xml_http_request? # Ajax request means in explorer
 
     @tagging = session[:tag_db] = params[:db] ? params[:db] : db if params[:db] || db
     @tagging ||= session[:tag_db] if session[:tag_db]

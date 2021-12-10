@@ -44,4 +44,5 @@
 
 :javascript
   ManageIQ.angular.app.value('securityGroupFormId', '#{@security_group.id}');
+  ManageIQ.angular.app.value('networkManagerId', '#{@security_group.ext_management_system.id.to_s}');
   miq_bootstrap('#form_div');

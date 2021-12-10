@@ -277,6 +277,7 @@ module OpsController::Diagnostics
       :log_userid           => depot.try(:authentication_userid),
       :log_aws_region       => depot.try(:aws_region),
       :openstack_region     => depot.try(:openstack_region),
+      :telefonica_region     => depot.try(:telefonica_region),
       :keystone_api_version => depot.try(:keystone_api_version),
       :v3_domain_ident      => depot.try(:v3_domain_ident),
       :swift_api_port       => port ? port : 5000,

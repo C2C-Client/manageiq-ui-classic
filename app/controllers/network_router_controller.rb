@@ -55,7 +55,11 @@ class NetworkRouterController < ApplicationController
     assert_privileges("ems_network_show_list")
     assert_privileges("cloud_tenant_show_list")
 
+    # C2C Provider : this code for fetching network manager id while router creation (button inside network manager).
     @in_a_form = true
+    if params[:ems_id]
+      @network_manager = find_record_with_rbac(ExtManagementSystem, params[:ems_id])
+    end
     drop_breadcrumb(
       :name => _("Add New Network Router"),
       :url  => "/network_router/new"
@@ -66,8 +70,10 @@ class NetworkRouterController < ApplicationController
     assert_privileges("network_router_new")
     case params[:button]
     when "cancel"
-      javascript_redirect(:action    => 'show_list',
-                          :flash_msg => _("Add of new Network Router was cancelled by the user"))
+      # C2C Provider : This Code prevent redirection of page to show_list after clicking cancel button while router creation.
+      # javascript_redirect(:action    => 'show_list',
+      #                     :flash_msg => _("Add of new Network Router was cancelled by the user"))
+      cancel_action(_("Add of new Network Router was cancelled by the user"))
 
     when "add"
       options = form_params(params)
@@ -97,10 +103,12 @@ class NetworkRouterController < ApplicationController
                 {:name => router_name, :details => task.message}, :error)
     end
 
-    @breadcrumbs.pop if @breadcrumbs
+    # C2C Provider : This Code prevent redirection of page to show_list page after adding/creating subnet.
+    # @breadcrumbs.pop if @breadcrumbs
     session[:edit] = nil
     flash_to_session
-    javascript_redirect(:action => "show_list")
+    # javascript_redirect(:action => "show_list")
+    javascript_redirect(previous_breadcrumb_url)
   end
 
   def delete_network_routers

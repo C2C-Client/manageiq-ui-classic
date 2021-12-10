@@ -60,8 +60,10 @@ class SecurityGroupController < ApplicationController
     assert_privileges("security_group_new")
     case params[:button]
     when "cancel"
-      javascript_redirect(:action    => 'show_list',
-                          :flash_msg => _('Add of new Security Group was cancelled by the user'))
+      # C2C Provider : This Code prevent redirection of page to show_list after clicking cancel button while SG creation.
+      session[:edit] = nil
+      flash_to_session(_('Add of new Security Group was cancelled by the user'))
+      javascript_redirect(previous_breadcrumb_url)
     when "add"
       @security_group = SecurityGroup.new
       options = form_params
@@ -99,10 +101,11 @@ class SecurityGroupController < ApplicationController
       }, :error)
     end
 
-    @breadcrumbs.pop if @breadcrumbs
+    # C2C Provider : This Code prevent redirection of page to show_list page after adding/creating SG.
+    # @breadcrumbs.pop if @breadcrumbs
     session[:edit] = nil
     flash_to_session
-    javascript_redirect(:action => "show_list")
+    javascript_redirect(previous_breadcrumb_url)
   end
 
   def delete_security_groups
@@ -125,6 +128,11 @@ class SecurityGroupController < ApplicationController
     end
     process_security_groups(security_groups_to_delete, "destroy") unless security_groups_to_delete.empty?
 
+    # C2C provider : issue/bug : after deleting security group it will redirect to show_list page.
+    # this should not happen, therefore we redirect to previous page.
+    # by using previous_breadcrumb_url method the page will redirect to previous page.
+    # this method define in application_controller.rb
+
     # refresh the list if applicable
     if @lastaction == "show_list"
       show_list
@@ -135,7 +143,7 @@ class SecurityGroupController < ApplicationController
         add_flash(_("The selected Security Group was deleted"))
       else # or (if we deleted what we were showing) we redirect to the listing
         flash_to_session
-        javascript_redirect(:action => 'show_list')
+        javascript_redirect(previous_breadcrumb_url)
       end
     end
   end
@@ -152,6 +160,10 @@ class SecurityGroupController < ApplicationController
     assert_privileges("security_group_new")
     @security_group = SecurityGroup.new
     @in_a_form = true
+    # C2C Provider : this code for fetching network manager id while SG creation (button inside network manager).
+    if params[:ems_id]
+      @network_manager = find_record_with_rbac(ExtManagementSystem, params[:ems_id])
+    end
     drop_breadcrumb(:name => _("Add New Security Group"), :url => "/security_group/new")
   end
 
@@ -288,6 +300,7 @@ class SecurityGroupController < ApplicationController
     options[:name] = params[:name] if params[:name]
     options[:description] = params[:description] if params[:description]
     options[:ems_id] = params[:ems_id] if params[:ems_id]
+    options[:network_id] = params[:network_id] if params[:network_id]
     options[:cloud_tenant] = find_record_with_rbac(CloudTenant, params[:cloud_tenant_id]) if params[:cloud_tenant_id]
     options
   end

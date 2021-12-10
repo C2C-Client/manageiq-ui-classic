@@ -24,6 +24,7 @@ ManageIQ.angular.app.controller('floatingIpFormController', ['$scope', 'floating
 
     miqService.sparkleOn();
     if (vm.newRecord) {
+      vm.floatingIpModel.ems_id = networkManagerId;  // C2C provider : set default provider network manager while creating resource through network manager.
       miqService.networkProviders()
         .then(function(providers) {
           vm.ems = providers;
@@ -32,6 +33,7 @@ ManageIQ.angular.app.controller('floatingIpFormController', ['$scope', 'floating
           vm.modelCopy = angular.copy(vm.floatingIpModel);
           miqService.sparkleOff();
         });
+      vm.filterNetworkManagerChanged(networkManagerId);   // C2C provider : calling filterNetworkManagerChanged function and pass network manager id.
     } else {
       API.get('/api/floating_ips/' +  floatingIpFormId + '?attributes=cloud_network,cloud_tenant,ext_management_system,network_port').then(function(data) {
         Object.assign(vm.floatingIpModel, data);
@@ -68,6 +70,9 @@ ManageIQ.angular.app.controller('floatingIpFormController', ['$scope', 'floating
   };
 
   vm.filterNetworkManagerChanged = function(id) {
+    miqService.getProviderAttributes(function(data) {
+      vm.floatingIpModel.emstype = data.type;
+    })(id);
     miqService.getCloudNetworksByEms(function(data) {
       vm.available_networks = data.resources;
     })(id);

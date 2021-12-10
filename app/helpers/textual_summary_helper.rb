@@ -158,7 +158,9 @@ module TextualSummaryHelper
 
     h = {:label => label, :value => count.to_s}.merge(textual_collection_icon(collection, klass))
 
-    if count.positive? && role_allows?(:feature => feature)
+    # C2C Provider : Added conditions for making grid value in network manager summary clickable when resource count is 0
+    # if count.positive? && role_allows?(:feature => feature)
+    if (count.positive? || label == "Cloud Networks" || label == "Cloud Subnets" || label == "Floating IPs" || label == "Security Groups" || label == "Network Routers") && role_allows?(:feature => feature)
       if link
         h[:link] = link
       elsif collection.respond_to?(:proxy_association)

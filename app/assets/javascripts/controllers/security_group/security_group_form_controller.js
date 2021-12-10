@@ -1,4 +1,4 @@
-ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFormId', 'miqService', 'API', '$q', function(securityGroupFormId, miqService, API, $q) {
+ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFormId', 'networkManagerId', 'miqService', 'API', '$q', function(securityGroupFormId, networkManagerId, miqService, API, $q) {
   var vm = this;
 
   var init = function() {
@@ -7,7 +7,7 @@ ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFo
       name: '',
       description: '',
       firewall_rules: [],
-      ems_id: ''
+      ems_id: networkManagerId,   // C2C provider : set default provider network manager while creating resource through network manager.
     };
     vm.ems = [];
 
@@ -28,6 +28,7 @@ ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFo
         .then(function(providers) {
           vm.ems = providers;
         });
+      vm.filterNetworkManagerChanged(networkManagerId);   // C2C provider : calling filterNetworkManagerChanged function and pass network manager id.
     } else {
       miqService.sparkleOn();
 
@@ -43,7 +44,7 @@ ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFo
   };
 
   function getSecurityGroup(id) {
-    return API.get('/api/security_groups/' + id + '?attributes=name,ext_management_system.name,description,cloud_tenant.name,firewall_rules,ems_id')
+    return API.get('/api/security_groups/' + id + '?attributes=name,ext_management_system.name,ext_management_system.type,description,cloud_tenant.name,firewall_rules,ems_id')
       .then(function(data) {
         Object.assign(vm.securityGroupModel, data);
         vm.securityGroupModel.firewall_rules_delete = false;
@@ -112,9 +113,21 @@ ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFo
     miqService.miqFlash('warn', __('All changes have been reset'));
   };
 
-  vm.filterNetworkManagerChanged = miqService.getProviderTenants(function(data) {
-    vm.available_tenants = data.resources;
-  });
+  vm.filterNetworkManagerChanged = function(id) {
+    if (id) {
+      API.get('/api/cloud_networks?expand=resources&attributes=name,ems_ref&filter[]=ems_id=' + id).then(function(data) {
+        vm.available_networks = data.resources;
+      }).catch(miqService.handleFailure);
+
+      miqService.getProviderAttributes(function(data) {
+        vm.securityGroupModel.emstype = data.type;
+      })(id);
+
+      miqService.getProviderTenants(function(data) {
+        vm.available_tenants = data.resources;
+      })(id);
+    }
+  };
 
   init();
 }]);

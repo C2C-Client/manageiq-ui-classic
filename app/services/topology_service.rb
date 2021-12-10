@@ -103,7 +103,20 @@ class TopologyService
   def build_topology
     included_relations             = self.class.instance_variable_get(:@included_relations)
     preloaded                      = @providers.includes(included_relations)
-    nodes, edges                   = map_to_graph(preloaded, build_entity_relationships(included_relations))
+    # C2C Provider : Added code for topology according to tenant
+    tenant_id                      = User.current_user.id
+    if tenant_id.to_s != '1'
+      providers = []
+      preloaded.each do |provider|
+        if provider.tenant_id == tenant_id
+          providers.append(provider)
+        end
+      end
+      providers
+    else
+      providers = preloaded
+    end
+    nodes, edges                   = map_to_graph(providers, build_entity_relationships(included_relations))
     filtered_nodes, filtered_edges = rbac_filter_nodes_and_edges(nodes, edges)
     filter_properties              = self.class.instance_variable_get(:@filter_properties)
 

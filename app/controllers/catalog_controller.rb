@@ -52,9 +52,11 @@ class CatalogController < ApplicationController
   ORCHESTRATION_TEMPLATES_NODES = {
     'ManageIQ::Providers::Amazon::CloudManager::OrchestrationTemplate'     => "otcfn",
     'ManageIQ::Providers::Openstack::CloudManager::OrchestrationTemplate'  => "othot",
+    'ManageIQ::Providers::Telefonica::CloudManager::OrchestrationTemplate' => "otthot",
     'ManageIQ::Providers::Azure::CloudManager::OrchestrationTemplate'      => "otazu",
     'ManageIQ::Providers::AzureStack::CloudManager::OrchestrationTemplate' => "otazs",
     'ManageIQ::Providers::Openstack::CloudManager::VnfdTemplate'           => "otvnf",
+    'ManageIQ::Providers::Telefonica::CloudManager::VnfdTemplate'          => "ottvnf",
     'ManageIQ::Providers::Vmware::CloudManager::OrchestrationTemplate'     => "otvap"
   }.freeze
 

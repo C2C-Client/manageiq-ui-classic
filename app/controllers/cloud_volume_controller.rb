@@ -18,9 +18,15 @@ class CloudVolumeController < ApplicationController
   def specific_buttons(pressed)
     case pressed
     when 'cloud_volume_delete'
-      @refresh_div = 'main_div'
+      # C2C provider : issue/bug : after deleting volumes it will redirect to show_list/main_tab page.
+      # where user can see all user resource. this should not happen, therefore we redirect to previous page.
+      # by using previous_breadcrumb_url method the page will redirect to previous page.
+      # this method define in application_controller.rb
+
+      # @refresh_div = 'main_div'
       delete_volumes
-      return false
+      javascript_redirect(previous_breadcrumb_url)
+      # return false
     when 'cloud_volume_attach'
       volume = find_record_with_rbac(CloudVolume, checked_item_id)
       if !volume.is_available?(:attach_volume) || volume.status != "available"
@@ -359,12 +365,14 @@ class CloudVolumeController < ApplicationController
     end
     delete_cloud_volumes(volumes_to_delete) unless volumes_to_delete.empty?
 
+    # C2C Provider : add delete intiated flash msg.
     # refresh the list if applicable
     if @lastaction == "show_list" && @breadcrumbs.last[:url].include?(@lastaction)
       show_list
       @refresh_partial = "layouts/gtl"
     elsif @lastaction == "show" && @layout == "cloud_volume"
       @single_delete = true unless flash_errors?
+      flash_to_session
     else
       drop_breadcrumb(:name => 'dummy', :url => " ") # missing a bc to get correctly back so here's a dummy
       flash_to_session
@@ -531,7 +539,8 @@ class CloudVolumeController < ApplicationController
     volume_id = session[:async][:params][:id]
     task = MiqTask.find(task_id)
     @volume = find_record_with_rbac(CloudVolume, volume_id)
-    if task.results_ready?
+    # C2C Provider : Modified code to check status of task
+    if MiqTask.status_ok?(task.status)
       add_flash(_("Snapshot for Cloud Volume \"%{name}\" created") % {
         :name => @volume.name
       })
@@ -568,8 +577,9 @@ class CloudVolumeController < ApplicationController
     options[:size] = params[:size].to_i if params[:size]
 
     # Depending on the storage manager type, collect required form params.
+    # Click2Cloud: Added telefonica as one of the storage manager type to collect required form params.
     case params[:emstype]
-    when "ManageIQ::Providers::StorageManager::CinderManager", "ManageIQ::Providers::Openstack::StorageManager::CinderManager"
+    when "ManageIQ::Providers::StorageManager::CinderManager", "ManageIQ::Providers::Openstack::StorageManager::CinderManager",  "ManageIQ::Providers::Telefonica::StorageManager::CinderManager"
       options.merge!(cinder_manager_options)
     when "ManageIQ::Providers::Amazon::StorageManager::Ebs"
       options.merge!(aws_ebs_options)

@@ -14,13 +14,14 @@
         :prefix                     => "/miq_request/",
         :keys                       => keys})
 
-    - keys = [:owner_manager, :owner_manager_mail, :owner_manager_phone]
-    = render(:partial => "/miq_request/prov_dialog_fieldset",
-      :locals         => {:workflow => wf,
-        :dialog                     => dialog,
-        :label                      => _("Manager"),
-        :prefix                     => "/miq_request/",
-        :keys                       => keys})
+    -# C2C Provider : Hide/remove Manager Field while Instance provisioning from Request tab
+    -# - keys = [:owner_manager, :owner_manager_mail, :owner_manager_phone]
+    -# = render(:partial => "/miq_request/prov_dialog_fieldset",
+    -#   :locals         => {:workflow => wf,
+    -#     :dialog                     => dialog,
+    -#     :label                      => _("Manager"),
+    -#     :prefix                     => "/miq_request/",
+    -#     :keys                       => keys})
   - when :purpose
     - keys = [:vm_tags]
     = render(:partial => "/miq_request/prov_dialog_fieldset",
@@ -70,7 +71,7 @@
         :prefix                     => "/miq_request/",
         :keys                       => keys})
   - when :volumes
-    - keys = [:name, :size, :delete_on_terminate]
+    - keys = wf.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Huawei::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Orange::CloudManager::ProvisionWorkflow) ? [:name, :size] : [:name, :size, :delete_on_terminate]
     = render(:partial => "/miq_request/prov_dialog_volume_fieldset",
       :locals         => {:workflow => wf,
         :dialog                     => dialog,
@@ -168,6 +169,12 @@
           :prefix       => "/miq_request/",
           :keys         => keys})
     - if wf.kind_of?(ManageIQ::Providers::Openstack::CloudManager::ProvisionWorkflow)
+      = render(:partial => "/miq_request/prov_dialog_cloud_quota",
+        :locals         => {:workflow => wf,
+          :dialog                     => dialog,
+          :prefix                     => "/miq_request/",
+          :keys                       => keys})
+    - if wf.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Huawei::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Otc::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Orange::CloudManager::ProvisionWorkflow)
       = render(:partial => "/miq_request/prov_dialog_cloud_quota",
         :locals         => {:workflow => wf,
           :dialog                     => dialog,

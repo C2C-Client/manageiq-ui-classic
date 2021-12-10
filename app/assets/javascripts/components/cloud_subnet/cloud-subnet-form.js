@@ -1,6 +1,7 @@
 ManageIQ.angular.app.component('cloudSubnetForm', {
   bindings: {
     cloudSubnetFormId: '@',
+    networkManagerId: '@',        // C2C provider : for network manager id or ext_management_name
   },
   controllerAs: 'vm',
   controller: cloudSubnetFormController,

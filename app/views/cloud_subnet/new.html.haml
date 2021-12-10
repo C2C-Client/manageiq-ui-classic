@@ -1,6 +1,8 @@
 = render :partial => "layouts/flash_msg"
 
-%cloud-subnet-form{'cloud-subnet-form-id' => 'new'}
+%cloud-subnet-form{'cloud-subnet-form-id' => 'new',
+                    'network-manager-id' => @network_manager.try(:id).to_s || "undefined"}
+-# C2C provider : for fetching network manager id.
 
 :javascript
   miq_bootstrap('cloud-subnet-form');
