@@ -150,6 +150,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       $scope.emsCommonModel.metrics_security_protocol       = data.metrics_security_protocol;
       $scope.emsCommonModel.metrics_tls_ca_certs            = data.metrics_tls_ca_certs;
       $scope.emsCommonModel.provider_region                 = data.provider_region;
+      $scope.emsCommonModel.project_name                    = data.project_name;
       $scope.emsCommonModel.default_userid                  = data.default_userid;
       $scope.emsCommonModel.amqp_userid                     = data.amqp_userid;
       $scope.emsCommonModel.console_userid                  = data.console_userid;
@@ -252,9 +253,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       $scope.emsCommonModel.prometheus_alerts_auth_status   = data.prometheus_alerts_auth_status;
       $scope.emsCommonModel.prometheus_alerts_security_protocol = data.prometheus_alerts_security_protocol;
       $scope.emsCommonModel.prometheus_alerts_tls_ca_certs  = data.prometheus_alerts_tls_ca_certs;
-      if (["openstack", "openstack_infra"].includes($scope.emsCommonModel.ems_controller)) {
-        $scope.emsCommonModel.api_version                   = 'v2';
-      }
+      $scope.emsCommonModel.api_version                     = 'v2';
       $scope.emsCommonModel.ems_controller                  = data.ems_controller;
       $scope.emsCommonModel.ems_controller === 'ems_container' ? $scope.emsCommonModel.default_api_port = '8443' : $scope.emsCommonModel.default_api_port = '';
       $scope.emsCommonModel.metrics_api_port                = '443';
@@ -337,7 +336,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
   $scope.isBasicInfoValid = function() {
     if (($scope.currentTab === 'default' && $scope.emsCommonModel.emstype !== 'azure') &&
       ($scope.emsCommonModel.emstype === 'ec2' ||
-       ['kubevirt', 'nuage_network', 'openstack', 'openstack_infra', 'rhevm', 'scvmm', 'vmwarews', 'vmware_cloud'].includes($scope.emsCommonModel.emstype) &&
+       ['kubevirt', 'nuage_network', 'openstack', 'openstack_infra', 'rhevm', 'scvmm', 'vmwarews', 'vmware_cloud', 'telefonica'].includes($scope.emsCommonModel.emstype) &&
        $scope.emsCommonModel.default_hostname) &&
       ($scope.emsCommonModel.default_userid !== '' && $scope.angularForm.default_userid !== undefined && $scope.angularForm.default_userid.$valid &&
        $scope.emsCommonModel.default_password !== '' && $scope.angularForm.default_password !== undefined && $scope.angularForm.default_password.$valid)) {
@@ -407,6 +406,9 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
         !!$scope.emsCommonModel.default_api_port &&
         !!$scope.emsCommonModel.default_userid &&
         !!$scope.emsCommonModel.default_password
+    }else if($scope.emsCommonModel.emstype == "telefonica" && $scope.emsCommonModel.project_name != '' &&
+      ($scope.currentTab == "default" )) {
+      return true;
     }
     return false;
   };
@@ -523,6 +525,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
     }
     $scope.emsCommonModel.default_api_port = '';
     $scope.emsCommonModel.provider_region = '';
+    $scope.emsCommonModel.project_name = "";
     $scope.emsCommonModel.default_security_protocol = '';
     $scope.emsCommonModel.default_tls_verify = true;
     $scope.emsCommonModel.default_tls_ca_certs = '';
@@ -532,6 +535,15 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       $scope.emsCommonModel.event_stream_selection = 'ceilometer';
       $scope.emsCommonModel.amqp_security_protocol = 'non-ssl';
       if ($scope.emsCommonModel.emstype === 'openstack') {
+        $scope.emsCommonModel.tenant_mapping_enabled = false;
+      }
+    } else if ($scope.emsCommonModel.emstype === 'telefonica') {
+      $scope.emsCommonModel.default_api_port = $scope.getDefaultApiPort($scope.emsCommonModel.emstype);
+      $scope.emsCommonModel.event_stream_selection = "ceilometer";
+      $scope.emsCommonModel.amqp_security_protocol = 'non-ssl';
+      $scope.emsCommonModel.default_security_protocol = 'ssl-with-validation';
+      $scope.emsCommonModel.api_version = "v3";
+      if ($scope.emsCommonModel.emstype === 'telefonica') {
         $scope.emsCommonModel.tenant_mapping_enabled = false;
       }
     } else if ($scope.emsCommonModel.emstype === 'nuage_network') {
@@ -563,6 +575,16 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
     }
   };
 
+  $scope.telefonicaSecurityProtocolChanged = function() {
+    if ($scope.emsCommonModel.emstype === 'telefonica') {
+      if ($scope.emsCommonModel.default_security_protocol === 'non-ssl') {
+        $scope.emsCommonModel.default_api_port = $scope.getDefaultApiPort($scope.emsCommonModel.emstype);
+      } else {
+        $scope.emsCommonModel.default_api_port = "13000";
+      }
+    }
+  };
+
   $scope.hawkularSecurityProtocolChanged = function() {
     var defaultNonSSLPort = '8080';
     var defaultSSLPort = '8443';
@@ -582,8 +604,12 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
     if ( emstype === 'openstack' || emstype === 'openstack_infra') {
       return '5000';
     }
-
-    return '';
+    else if( emstype=='telefonica' ) {
+      return '5000';
+    }
+    else {
+      return '';
+    }
   };
 
   $scope.populatePostValidationModel = function() {
@@ -645,6 +671,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
         azure_tenant_id:           $scope.emsCommonModel.azure_tenant_id,
         subscription:              $scope.emsCommonModel.subscription,
         provider_region:           $scope.emsCommonModel.provider_region,
+        project_name:              $scope.emsCommonModel.project_name
       };
     } else if (prefix === 'amqp') {
       if ($scope.newRecord) {
